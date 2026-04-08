@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "RiceApp",
+    "slug": "riceapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "assets": [
+      "./assets/rice_model.tflite"
+    ],
+    "plugins": [
+      "expo-sqlite",
+      "expo-asset"
+    ],
+    "android": {
+      "package": "com.riceapp.stressdetector",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e0b67aae-ab0b-4343-819a-064e3136e41f"
+      }
+    }
+  }
+}
