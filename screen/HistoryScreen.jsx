@@ -1,27 +1,41 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, RefreshControl } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faTrash, faSun, faBug, faLeaf, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { getAllScans, deleteScan, clearAllScans } from "../services/database";
-import { colors, CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
+import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
+import { ThemeContext } from "../App"; // <-- Import Context
 
-export default function HistoryScreen() {
+export default function HistoryScreen({ userId }) {
+  const { isDark, colors } = useContext(ThemeContext);
+  const dynamicClassColors = CLASS_COLORS(isDark);
+  const styles = getStyles(colors);
+
   const [scans, setScans]           = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadScans = useCallback(async () => { setScans(await getAllScans()); }, []);
+  const loadScans = useCallback(async () => { 
+    setScans(await getAllScans(userId)); 
+  }, [userId]);
+  
   useEffect(() => { loadScans(); }, [loadScans]);
 
   const onRefresh = async () => { setRefreshing(true); await loadScans(); setRefreshing(false); };
 
   const handleDelete = (id) => Alert.alert("Delete Scan", "Remove this scan?", [
     { text: "Cancel", style: "cancel" },
-    { text: "Delete", style: "destructive", onPress: async () => { await deleteScan(id); await loadScans(); } }
+    { text: "Delete", style: "destructive", onPress: async () => { 
+        await deleteScan(id, userId);
+        await loadScans(); 
+    } }
   ]);
 
   const handleClearAll = () => Alert.alert("Clear All", "Delete all scan records?", [
     { text: "Cancel", style: "cancel" },
-    { text: "Clear All", style: "destructive", onPress: async () => { await clearAllScans(); await loadScans(); } }
+    { text: "Clear All", style: "destructive", onPress: async () => { 
+        await clearAllScans(userId);
+        await loadScans(); 
+    } }
   ]);
 
   const faIconMap = { sun: faSun, bug: faBug, leaf: faLeaf };
@@ -31,7 +45,7 @@ export default function HistoryScreen() {
   };
 
   const renderItem = ({ item }) => {
-    const clr    = CLASS_COLORS[item.display_name] || CLASS_COLORS.Healthy;
+    const clr    = dynamicClassColors[item.display_name] || dynamicClassColors.Healthy;
     const faIcon = faIconMap[CLASS_FA_ICONS[item.display_name]] || faLeaf;
     return (
       <View style={styles.card}>
@@ -53,7 +67,7 @@ export default function HistoryScreen() {
           <Text style={styles.recommendation} numberOfLines={1}>{item.recommendation}</Text>
         </View>
         <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteBtn}>
-          <FontAwesomeIcon icon={faTrash} size={15} color="#F44336" />
+          <FontAwesomeIcon icon={faTrash} size={15} color={colors.pestBorder} />
         </TouchableOpacity>
       </View>
     );
@@ -67,8 +81,8 @@ export default function HistoryScreen() {
         <Text style={styles.headerCount}>{scans.length} records</Text>
         {scans.length > 0 && (
           <TouchableOpacity onPress={handleClearAll} style={styles.clearBtn}>
-            <FontAwesomeIcon icon={faTrash} size={12} color="#F44336" />
-            <Text style={styles.clearText}>Clear</Text>
+            <FontAwesomeIcon icon={faTrash} size={12} color={colors.pestBorder} />
+            <Text style={[styles.clearText, { color: colors.pestBorder }]}>Clear</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -92,13 +106,13 @@ export default function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   container      : { flex: 1 },
   header         : { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 14 },
   headerTitle    : { fontSize: 17, fontWeight: "700", color: colors.primary, flex: 1 },
   headerCount    : { fontSize: 13, color: colors.textLight },
-  clearBtn       : { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "#FFEBEE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
-  clearText      : { color: "#F44336", fontSize: 12, fontWeight: "600" },
+  clearBtn       : { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: colors.pestBg, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  clearText      : { fontSize: 12, fontWeight: "600" },
   card           : { backgroundColor: colors.cardBg, borderRadius: 14, padding: 14, marginBottom: 12, flexDirection: "row", alignItems: "center", gap: 12 },
   thumb          : { width: 64, height: 64, borderRadius: 10 },
   thumbPlaceholder: { width: 64, height: 64, borderRadius: 10, alignItems: "center", justifyContent: "center" },
@@ -106,7 +120,7 @@ const styles = StyleSheet.create({
   badge          : { alignSelf: "flex-start", borderRadius: 50, borderWidth: 1.5, paddingHorizontal: 10, paddingVertical: 4, flexDirection: "row", alignItems: "center", gap: 5 },
   badgeText      : { fontWeight: "700", fontSize: 12 },
   confidence     : { fontSize: 12, color: colors.text, fontWeight: "600" },
-  uncertainTag   : { fontSize: 11, color: "#E65100" },
+  uncertainTag   : { fontSize: 11, color: colors.droughtBorder },
   timestamp      : { fontSize: 11, color: colors.textMuted },
   recommendation : { fontSize: 11, color: colors.textLight, fontStyle: "italic" },
   deleteBtn      : { padding: 8 },

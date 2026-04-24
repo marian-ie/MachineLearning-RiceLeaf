@@ -15,6 +15,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@tensorflow/tfjs": "^4.22.0",
+    "bcryptjs": "^3.0.3",
     "expo": "~55.0.9",
     "expo-asset": "~55.0.10",
     "expo-dev-client": "~55.0.19",

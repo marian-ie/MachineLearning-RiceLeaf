@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHouse, faMagnifyingGlass, faBookOpen, faChartBar } from "@fortawesome/free-solid-svg-icons";
-import { colors } from "../styles/theme";
+import { ThemeContext } from "../App"; // <-- Import Context
 
 const TABS = [
   { key: "dashboard", label: "Home",    icon: faHouse           },
@@ -12,6 +12,9 @@ const TABS = [
 ];
 
 export default function TabBar({ activeTab, onTabPress }) {
+  const { colors } = useContext(ThemeContext);
+  const styles = getStyles(colors);
+
   return (
     <View style={styles.container}>
       {TABS.map((tab) => {
@@ -26,7 +29,7 @@ export default function TabBar({ activeTab, onTabPress }) {
             <FontAwesomeIcon
               icon={tab.icon}
               size={16}
-              color={isActive ? colors.white : colors.primary}
+              color={isActive ? "#FFF" : colors.primary}
             />
             <Text style={[styles.label, isActive && styles.activeLabel]}>
               {tab.label}
@@ -38,10 +41,10 @@ export default function TabBar({ activeTab, onTabPress }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container : { flexDirection: "row", backgroundColor: colors.cardBg, borderRadius: 50, padding: 4, marginBottom: 20 },
+const getStyles = (colors) => StyleSheet.create({
+  container : { flexDirection: "row", backgroundColor: colors.cardBg, borderRadius: 50, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: colors.borderLight },
   tab       : { flex: 1, paddingVertical: 10, borderRadius: 50, alignItems: "center", gap: 3 },
   activeTab : { backgroundColor: colors.primary },
   label     : { fontSize: 11, fontWeight: "600", color: colors.primary },
-  activeLabel: { color: colors.white, fontWeight: "700" },
+  activeLabel: { color: "#FFF", fontWeight: "700" },
 });

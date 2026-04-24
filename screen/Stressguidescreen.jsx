@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity,
@@ -8,18 +8,17 @@ import {
   faSun, faBug, faLeaf, faChevronDown, faChevronUp,
   faCircleDot, faFlask, faListCheck, faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
-import { colors, STRESS_DATA } from "../styles/theme";
+import { getStressData } from "../styles/theme";
+import { ThemeContext } from "../App";
 
 const STRESS_KEYS = ["Drought", "PestInfestation", "Healthy"];
 
-const SECTION_ICONS = {
-  symptoms       : faCircleDot,
-  recommendations: faListCheck,
-  treatments     : faFlask,
-};
-
 function StressCard({ stressKey }) {
-  const data = STRESS_DATA[stressKey];
+  const { isDark, colors } = useContext(ThemeContext);
+  const dynamicStressData = getStressData(isDark);
+  const styles = getStyles(colors);
+  
+  const data = dynamicStressData[stressKey];
   const [expanded, setExpanded] = useState(false);
   const [activeSection, setActiveSection] = useState("symptoms");
 
@@ -34,7 +33,6 @@ function StressCard({ stressKey }) {
 
   return (
     <View style={[styles.card, { borderColor: data.border }]}>
-      {/* Card Header */}
       <TouchableOpacity
         style={[styles.cardHeader, { backgroundColor: data.bg }]}
         onPress={() => setExpanded(!expanded)}
@@ -50,19 +48,13 @@ function StressCard({ stressKey }) {
             <Text style={styles.severityText}>Severity: {data.severity}</Text>
           </View>
         </View>
-        <FontAwesomeIcon
-          icon={expanded ? faChevronUp : faChevronDown}
-          size={16}
-          color={data.color}
-        />
+        <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} size={16} color={data.color} />
       </TouchableOpacity>
 
-      {/* Description */}
       {expanded && (
         <View style={styles.cardBody}>
           <Text style={styles.description}>{data.description}</Text>
 
-          {/* Section Tabs */}
           <View style={styles.sectionTabs}>
             {SECTIONS.map((sec) => (
               <TouchableOpacity
@@ -89,7 +81,6 @@ function StressCard({ stressKey }) {
             ))}
           </View>
 
-          {/* Section Content */}
           {SECTIONS.filter((s) => s.key === activeSection).map((sec) => (
             <View key={sec.key} style={styles.sectionContent}>
               {sec.items.map((item, i) => (
@@ -107,10 +98,11 @@ function StressCard({ stressKey }) {
 }
 
 export default function StressGuideScreen() {
+  const { colors } = useContext(ThemeContext);
+  const styles = getStyles(colors);
+
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-
-      {/* Header */}
       <View style={styles.headerBox}>
         <FontAwesomeIcon icon={faLeaf} size={20} color={colors.primary} />
         <View style={{ flex: 1 }}>
@@ -121,12 +113,11 @@ export default function StressGuideScreen() {
         </View>
       </View>
 
-      {/* Quick Legend */}
       <View style={styles.legendRow}>
         {[
-          { label: "Drought",  color: "#FF9800", icon: faSun  },
-          { label: "Pest",     color: "#F44336", icon: faBug  },
-          { label: "Healthy",  color: "#2E8B57", icon: faLeaf },
+          { label: "Drought",  color: colors.droughtBorder, icon: faSun  },
+          { label: "Pest",     color: colors.pestBorder,    icon: faBug  },
+          { label: "Healthy",  color: colors.healthyBorder, icon: faLeaf },
         ].map((item) => (
           <View key={item.label} style={styles.legendItem}>
             <FontAwesomeIcon icon={item.icon} size={14} color={item.color} />
@@ -135,32 +126,29 @@ export default function StressGuideScreen() {
         ))}
       </View>
 
-      {/* Stress Cards */}
       {STRESS_KEYS.map((key) => (
         <StressCard key={key} stressKey={key} />
       ))}
 
-      {/* Disclaimer */}
       <View style={styles.disclaimer}>
-        <FontAwesomeIcon icon={faTriangleExclamation} size={14} color="#E65100" />
-        <Text style={styles.disclaimerText}>
+        <FontAwesomeIcon icon={faTriangleExclamation} size={14} color={colors.droughtBorder} />
+        <Text style={[styles.disclaimerText, { color: colors.droughtBorder }]}>
           This guide is for reference only. Always consult a certified agronomist for professional diagnosis and treatment.
         </Text>
       </View>
-
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   container    : { paddingBottom: 32 },
   headerBox    : { backgroundColor: colors.cardBg, borderRadius: 14, padding: 16, flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 14 },
   headerTitle  : { fontSize: 18, fontWeight: "700", color: colors.primary },
   headerSub    : { fontSize: 12, color: colors.textLight, marginTop: 2, lineHeight: 18 },
-  legendRow    : { flexDirection: "row", justifyContent: "space-around", backgroundColor: colors.white, borderRadius: 12, padding: 12, marginBottom: 14 },
+  legendRow    : { flexDirection: "row", justifyContent: "space-around", backgroundColor: colors.cardBg, borderRadius: 12, padding: 12, marginBottom: 14 },
   legendItem   : { flexDirection: "row", alignItems: "center", gap: 6 },
   legendText   : { fontSize: 13, fontWeight: "600" },
-  card         : { backgroundColor: colors.white, borderRadius: 16, borderWidth: 1.5, marginBottom: 14, overflow: "hidden" },
+  card         : { backgroundColor: colors.cardBg, borderRadius: 16, borderWidth: 1.5, marginBottom: 14, overflow: "hidden" },
   cardHeader   : { flexDirection: "row", alignItems: "center", padding: 16, gap: 12 },
   iconCircle   : { width: 50, height: 50, borderRadius: 25, borderWidth: 2, alignItems: "center", justifyContent: "center" },
   headerInfo   : { flex: 1, gap: 6 },
@@ -176,6 +164,6 @@ const styles = StyleSheet.create({
   itemRow      : { flexDirection: "row", alignItems: "flex-start", gap: 10 },
   itemDot      : { width: 7, height: 7, borderRadius: 4, marginTop: 6 },
   itemText     : { flex: 1, fontSize: 13, color: colors.text, lineHeight: 20 },
-  disclaimer   : { flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: "#FFF3E0", borderRadius: 12, padding: 14 },
-  disclaimerText: { flex: 1, fontSize: 12, color: "#E65100", lineHeight: 18 },
+  disclaimer   : { flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: colors.droughtBg, borderRadius: 12, padding: 14 },
+  disclaimerText: { flex: 1, fontSize: 12, lineHeight: 18 },
 });

@@ -1,19 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChartBar, faSun, faBug, faLeaf, faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { getAllScans, getScanStats } from "../services/database";
-import { colors, CLASS_COLORS } from "../styles/theme";
+import { CLASS_COLORS } from "../styles/theme";
+import { ThemeContext } from "../App";
 
-export default function RecordScreen() {
+export default function RecordScreen({ userId }) {
+  const { isDark, colors } = useContext(ThemeContext);
+  const dynamicClassColors = CLASS_COLORS(isDark);
+  const styles = getStyles(colors);
+
   const [stats,      setStats]      = useState({ total: 0, drought: 0, pest: 0, healthy: 0 });
   const [scans,      setScans]      = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
-    const [s, all] = await Promise.all([getScanStats(), getAllScans()]);
+    const [s, all] = await Promise.all([getScanStats(userId), getAllScans(userId)]);
     setStats(s); setScans(all);
-  }, []);
+  }, [userId]);
 
   useEffect(() => { loadData(); }, [loadData]);
   const onRefresh = async () => { setRefreshing(true); await loadData(); setRefreshing(false); };
@@ -47,9 +52,9 @@ export default function RecordScreen() {
       {/* Summary */}
       <View style={styles.summaryRow}>
         {[
-          { label: "Total Scans",  value: stats.total,                          color: colors.primary,                    bg: colors.cardBg,                         icon: faChartBar },
-          { label: "Healthy Rate", value: `${getPct(stats.healthy)}%`,          color: CLASS_COLORS.Healthy.text,         bg: CLASS_COLORS.Healthy.bg,               icon: faLeaf     },
-          { label: "Stress Rate",  value: `${getPct(stats.drought+stats.pest)}%`, color: CLASS_COLORS.PestInfestation.text, bg: CLASS_COLORS.PestInfestation.bg,     icon: faChartPie },
+          { label: "Total Scans",  value: stats.total,                          color: colors.primary,                             bg: colors.cardBg,                                 icon: faChartBar },
+          { label: "Healthy Rate", value: `${getPct(stats.healthy)}%`,          color: dynamicClassColors.Healthy.text,            bg: dynamicClassColors.Healthy.bg,                 icon: faLeaf     },
+          { label: "Stress Rate",  value: `${getPct(stats.drought+stats.pest)}%`, color: dynamicClassColors.PestInfestation.text, bg: dynamicClassColors.PestInfestation.bg,       icon: faChartPie },
         ].map((item) => (
           <View key={item.label} style={[styles.summaryCard, { backgroundColor: item.bg }]}>
             <FontAwesomeIcon icon={item.icon} size={16} color={item.color} />
@@ -69,7 +74,7 @@ export default function RecordScreen() {
           <Text style={styles.noData}>No scan data yet</Text>
         ) : BARS.map((bar) => {
           const pct = getPct(bar.value);
-          const clr = CLASS_COLORS[bar.key];
+          const clr = dynamicClassColors[bar.key];
           return (
             <View key={bar.key} style={styles.barRow}>
               <View style={styles.barLabelRow}>
@@ -96,7 +101,7 @@ export default function RecordScreen() {
             { label: "Drought", value: stats.drought, key: "Drought", icon: faSun  },
             { label: "Pest",    value: stats.pest,    key: "PestInfestation", icon: faBug },
           ].map((item) => {
-            const clr = CLASS_COLORS[item.key];
+            const clr = dynamicClassColors[item.key];
             return (
               <View key={item.key} style={[styles.stressCard, { backgroundColor: clr.bg, borderColor: clr.border }]}>
                 <FontAwesomeIcon icon={item.icon} size={28} color={clr.text} />
@@ -120,9 +125,9 @@ export default function RecordScreen() {
             <View key={date} style={styles.activityRow}>
               <Text style={styles.activityDate}>{date}</Text>
               <View style={styles.activityDots}>
-                {day.drought > 0 && <View style={[styles.dot, { backgroundColor: CLASS_COLORS.Drought.border }]}><Text style={styles.dotText}>{day.drought}</Text></View>}
-                {day.pest > 0    && <View style={[styles.dot, { backgroundColor: CLASS_COLORS.PestInfestation.border }]}><Text style={styles.dotText}>{day.pest}</Text></View>}
-                {day.healthy > 0 && <View style={[styles.dot, { backgroundColor: CLASS_COLORS.Healthy.border }]}><Text style={styles.dotText}>{day.healthy}</Text></View>}
+                {day.drought > 0 && <View style={[styles.dot, { backgroundColor: dynamicClassColors.Drought.border }]}><Text style={styles.dotText}>{day.drought}</Text></View>}
+                {day.pest > 0    && <View style={[styles.dot, { backgroundColor: dynamicClassColors.PestInfestation.border }]}><Text style={styles.dotText}>{day.pest}</Text></View>}
+                {day.healthy > 0 && <View style={[styles.dot, { backgroundColor: dynamicClassColors.Healthy.border }]}><Text style={styles.dotText}>{day.healthy}</Text></View>}
               </View>
               <Text style={styles.activityTotal}>{day.total} scans</Text>
             </View>
@@ -133,7 +138,7 @@ export default function RecordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   container    : { paddingBottom: 32 },
   summaryRow   : { flexDirection: "row", gap: 10, marginBottom: 14 },
   summaryCard  : { flex: 1, borderRadius: 12, padding: 12, alignItems: "center", gap: 4 },
@@ -146,7 +151,7 @@ const styles = StyleSheet.create({
   barRow       : { marginBottom: 12 },
   barLabelRow  : { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 6 },
   barLabel     : { fontSize: 13, color: colors.text, fontWeight: "500" },
-  barTrack     : { height: 10, backgroundColor: "#D0EAD9", borderRadius: 5, overflow: "hidden", marginBottom: 4 },
+  barTrack     : { height: 10, backgroundColor: colors.borderLight, borderRadius: 5, overflow: "hidden", marginBottom: 4 },
   barFill      : { height: 10, borderRadius: 5 },
   barPct       : { fontSize: 12, fontWeight: "600" },
   stressRow    : { flexDirection: "row", gap: 12 },

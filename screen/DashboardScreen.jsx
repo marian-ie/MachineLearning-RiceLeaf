@@ -1,28 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faMagnifyingGlass, faSun, faBug, faLeaf, faLightbulb, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
-import { colors, CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
+import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
 import { getScanStats } from "../services/database";
+import { ThemeContext } from "../App"; // <-- Import Context
 
-export default function DashboardScreen({ history, prediction, onScanPress }) {
+export default function DashboardScreen({ history, prediction, onScanPress, userId }) {
+  const { isDark, colors } = useContext(ThemeContext); // <-- Get dynamic colors
+  const dynamicClassColors = CLASS_COLORS(isDark);     // <-- Get dynamic class colors
+  const styles = getStyles(colors);                    // <-- Generate dynamic styles
+
   const [stats, setStats] = useState({ total: 0, drought: 0, pest: 0, healthy: 0 });
 
   useEffect(() => {
-    const load = async () => { const s = await getScanStats(); setStats(s); };
+    const load = async () => { 
+      const s = await getScanStats(userId);
+      setStats(s); 
+    };
     load();
-  }, [history]);
+  }, [history, userId]);
 
   const predName = prediction?.label?.replace("ClassA-","").replace("ClassB-","").replace("ClassC-","");
-  const predClr  = predName ? CLASS_COLORS[predName] || CLASS_COLORS.Healthy : null;
+  const predClr  = predName ? dynamicClassColors[predName] || dynamicClassColors.Healthy : null;
   const faIconMap = { sun: faSun, bug: faBug, leaf: faLeaf };
   const predFaIcon = predName ? faIconMap[CLASS_FA_ICONS[predName]] || faLeaf : null;
 
   const STATS = [
-    { label: "Total",   value: stats.total,   color: colors.primary,               bg: colors.cardBg,                   icon: faMagnifyingGlass },
-    { label: "Drought", value: stats.drought, color: CLASS_COLORS.Drought.text,    bg: CLASS_COLORS.Drought.bg,         icon: faSun             },
-    { label: "Pest",    value: stats.pest,    color: CLASS_COLORS.PestInfestation.text, bg: CLASS_COLORS.PestInfestation.bg, icon: faBug         },
-    { label: "Healthy", value: stats.healthy, color: CLASS_COLORS.Healthy.text,    bg: CLASS_COLORS.Healthy.bg,         icon: faLeaf            },
+    { label: "Total",   value: stats.total,   color: colors.primary,                      bg: colors.cardBg,                          icon: faMagnifyingGlass },
+    { label: "Drought", value: stats.drought, color: dynamicClassColors.Drought.text,     bg: dynamicClassColors.Drought.bg,          icon: faSun             },
+    { label: "Pest",    value: stats.pest,    color: dynamicClassColors.PestInfestation.text, bg: dynamicClassColors.PestInfestation.bg, icon: faBug         },
+    { label: "Healthy", value: stats.healthy, color: dynamicClassColors.Healthy.text,     bg: dynamicClassColors.Healthy.bg,          icon: faLeaf            },
   ];
 
   const TIPS = [
@@ -34,7 +42,6 @@ export default function DashboardScreen({ history, prediction, onScanPress }) {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-
       {/* Latest Result */}
       <View style={styles.resultCard}>
         <Text style={styles.cardTitle}>Scan Result</Text>
@@ -93,12 +100,12 @@ export default function DashboardScreen({ history, prediction, onScanPress }) {
           </View>
         ))}
       </View>
-
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+// Wrap styles in a function that accepts dynamic colors
+const getStyles = (colors) => StyleSheet.create({
   resultCard  : { backgroundColor: colors.cardBg, borderRadius: 16, padding: 18, marginBottom: 14 },
   cardTitle   : { fontSize: 17, fontWeight: "700", color: colors.primary, marginBottom: 14 },
   noResultBox : { alignItems: "center", paddingVertical: 20, gap: 8 },
