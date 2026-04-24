@@ -1,16 +1,28 @@
 import * as SQLite from "expo-sqlite";
 import bcrypt from "bcryptjs";
 
+// 👇 FIX: Tell bcrypt how to generate random numbers in React Native
+bcrypt.setRandomFallback((len) => {
+  const randomBytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    randomBytes[i] = Math.floor(Math.random() * 256);
+  }
+  return randomBytes;
+});
+// 👆 -----------------------------------------------------------
+
 let db;
 
 export const initDatabase = async () => {
   db = await SQLite.openDatabaseAsync("rice_history.db");
+  
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,           
       username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
+      password TEXT NOT NULL,
+      profile_pic TEXT
     );
 
     CREATE TABLE IF NOT EXISTS scan_history (
@@ -29,7 +41,15 @@ export const initDatabase = async () => {
       FOREIGN KEY (user_id) REFERENCES users (id)
     );
   `);
-  console.log("Database ready with Authentication");
+
+  // 👇 FIX: Safely add the column to existing databases without deleting user data!
+  try {
+    await db.execAsync("ALTER TABLE users ADD COLUMN profile_pic TEXT;");
+  } catch (error) {
+    // If it throws an error, it just means the column already exists. We can ignore it!
+  }
+
+  console.log("Database ready and refreshed!");
   return db;
 };
 
@@ -45,7 +65,8 @@ export const registerUser = async (name, username, password) => {
     );
     return { success: true, userId: result.lastInsertRowId };
   } catch (error) {
-    return { success: false, error: "Username already exists or is invalid." };
+    console.error("REGISTER ERROR: ", error);
+    return { success: false, error: String(error) }; 
   }
 };
 
@@ -54,9 +75,28 @@ export const loginUser = async (username, password) => {
   const user = await db.getFirstAsync("SELECT * FROM users WHERE username = ?", [username]);
   
   if (user && bcrypt.compareSync(password, user.password)) {
-    return { success: true, user: { id: user.id, name: user.name, email: user.username } };
+    return { 
+      success: true, 
+      user: { 
+        id: user.id, 
+        name: user.name, 
+        email: user.username,
+        profilePic: user.profile_pic // Pass the picture to the app!
+      } 
+    };
   }
   return { success: false, error: "Invalid username or password" };
+};
+
+export const updateProfilePic = async (userId, imageUri) => {
+  if (!db) await initDatabase();
+  try {
+    await db.runAsync("UPDATE users SET profile_pic = ? WHERE id = ?", [imageUri, userId]);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update profile picture:", error);
+    return { success: false, error: String(error) };
+  }
 };
 
 export const saveScan = async (scanData, userId) => {
@@ -89,7 +129,7 @@ export const getAllScans = async (userId) => {
     [userId]
   );
   
-  return rows.map((row) => ({
+  return (rows || []).map((row) => ({
     ...row,
     is_uncertain: row.is_uncertain === 1,
     all_probabilities: {
@@ -125,23 +165,18 @@ export const getScanStats = async (userId) => {
   };
 };
 
-
 export const changeUserPassword = async (userId, currentPassword, newPassword) => {
   if (!db) await initDatabase();
   
-  // 1. Fetch the user to verify their current password
   const user = await db.getFirstAsync("SELECT * FROM users WHERE id = ?", [userId]);
   if (!user) return { success: false, error: "User not found." };
 
-  // 2. Compare current password using bcrypt
   const isMatch = bcrypt.compareSync(currentPassword, user.password);
   if (!isMatch) return { success: false, error: "Current password is incorrect." };
 
-  // 3. Hash the NEW password
   const salt = bcrypt.genSaltSync(10);
   const hashedNewPassword = bcrypt.hashSync(newPassword, salt);
 
-  // 4. Update the database
   await db.runAsync(
     "UPDATE users SET password = ? WHERE id = ?",
     [hashedNewPassword, userId]
@@ -152,10 +187,7 @@ export const changeUserPassword = async (userId, currentPassword, newPassword) =
 export const deleteUserAccount = async (userId) => {
   if (!db) await initDatabase();
   
-  // 1. Delete all of their history first (to clean up the device storage)
   await db.runAsync("DELETE FROM scan_history WHERE user_id = ?", [userId]);
-  
-  // 2. Delete the user account
   await db.runAsync("DELETE FROM users WHERE id = ?", [userId]);
   return { success: true };
 };

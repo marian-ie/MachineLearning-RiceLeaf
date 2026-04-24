@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch, Modal, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch, Modal, KeyboardAvoidingView, Platform, Alert, Image } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faRightFromBracket, faSun, faMoon, faTrash, faChevronRight, faShield, faCircleXmark, faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
-import { changeUserPassword } from "../services/database.js";
+import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faRightFromBracket, faSun, faMoon, faTrash, faChevronRight, faShield, faCircleXmark, faFloppyDisk, faCamera } from "@fortawesome/free-solid-svg-icons";
+import { changeUserPassword, updateProfilePic } from "../services/database.js";
 import { ThemeContext } from "../App";
+import * as ImagePicker from 'expo-image-picker';
 
-// 👇 FIX: Moved outside main function. Passed styles and colors as props.
 const PwField = ({ icon, placeholder, value, onChangeText, secure, toggle, styles, colors }) => (
   <View style={styles.inputWrapper}>
     <View style={styles.inputIcon}>
@@ -26,7 +26,6 @@ const PwField = ({ icon, placeholder, value, onChangeText, secure, toggle, style
   </View>
 );
 
-// 👇 FIX: Moved outside main function. Passed styles and colors as props.
 const SettingRow = ({ icon, iconColor, label, sublabel, right, onPress, danger, styles, colors }) => (
   <TouchableOpacity style={styles.settingRow} onPress={onPress} activeOpacity={onPress ? 0.7 : 1} disabled={!onPress}>
     <View style={[styles.settingIcon, { backgroundColor: danger ? colors.pestBg : colors.borderLight }]}>
@@ -44,6 +43,9 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
   const { colors } = useContext(ThemeContext);
   const styles = getStyles(colors);
 
+  // Load the saved picture if they have one, otherwise null
+  const [profilePic,   setProfilePic]   = useState(user?.profilePic || null);
+
   const [pwModal,      setPwModal]      = useState(false);
   const [currentPw,    setCurrentPw]    = useState("");
   const [newPw,        setNewPw]        = useState("");
@@ -59,6 +61,43 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
   const initials = user?.name
     ? user.name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
     : "??";
+
+  const handleUpdatePicture = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (permissionResult.granted === false) {
+        Alert.alert("Permission Required", "You need to allow access to your photos to change your profile picture.");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true, 
+        aspect: [1, 1],
+        quality: 0.5, 
+      });
+
+      if (!result.canceled) {
+        const newImageUri = result.assets[0].uri;
+        
+        // 1. Update the UI instantly
+        setProfilePic(newImageUri); 
+        
+        // 2. Update the user session object so it doesn't disappear when navigating tabs
+        if (user) user.profilePic = newImageUri; 
+
+        // 3. Save it permanently to the database
+        const dbResult = await updateProfilePic(user.id, newImageUri);
+        if (!dbResult.success) {
+          Alert.alert("Notice", "Profile picture updated, but failed to save to database: " + dbResult.error);
+        }
+      }
+    } catch (error) {
+      console.error("Image Picker Error: ", error);
+      Alert.alert("Error", "Something went wrong while trying to select an image.");
+    }
+  };
 
   const handleSavePassword = async () => {
     if (!currentPw || !newPw || !confirmPw) { Alert.alert("Missing fields", "Please fill in all password fields."); return; }
@@ -86,9 +125,22 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
   return (
     <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
       <View style={styles.profileCard}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initials}</Text>
+        
+        {/* Avatar Container with Floating Camera Icon */}
+        <View style={styles.avatarContainer}>
+          {profilePic ? (
+            <Image source={{ uri: profilePic }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{initials}</Text>
+            </View>
+          )}
+          
+          <TouchableOpacity style={styles.editBadge} onPress={handleUpdatePicture} activeOpacity={0.8}>
+            <FontAwesomeIcon icon={faCamera} size={12} color="#FFF" />
+          </TouchableOpacity>
         </View>
+
         <Text style={styles.userName}>{user?.name}</Text>
         <View style={styles.emailRow}>
           <FontAwesomeIcon icon={faEnvelope} size={12} color={colors.textLight} />
@@ -126,7 +178,7 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
       </View>
 
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Danger Zone</Text>
+        <Text style={styles.sectionTitle}>Account Setting</Text>
         <SettingRow icon={faTrash} label="Delete Account" sublabel="Permanently remove your data" danger onPress={() => setDeleteModal(true)} right={<FontAwesomeIcon icon={faChevronRight} size={12} color={colors.pestBorder} />} styles={styles} colors={colors} />
       </View>
 
@@ -151,7 +203,6 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
             </View>
             <Text style={styles.modalSub}>Enter your current password then choose a new one.</Text>
             
-            {/* 👇 FIX: Passed styles and colors into PwField */}
             <PwField icon={faLock} placeholder="Current password" value={currentPw} onChangeText={setCurrentPw} secure={!showCurrent} toggle={() => setShowCurrent(p => !p)} styles={styles} colors={colors} />
             <PwField icon={faLock} placeholder="New password" value={newPw} onChangeText={setNewPw} secure={!showNew} toggle={() => setShowNew(p => !p)} styles={styles} colors={colors} />
             <PwField icon={faLock} placeholder="Confirm new password" value={confirmPw} onChangeText={setConfirmPw} secure={!showConfirm} toggle={() => setShowConfirm(p => !p)} styles={styles} colors={colors} />
@@ -218,7 +269,12 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
 const getStyles = (colors) => StyleSheet.create({
   screen          : { flex: 1, backgroundColor: colors.appBg },
   profileCard     : { backgroundColor: colors.cardBg, borderRadius: 20, padding: 24, marginHorizontal: 18, marginTop: 18, marginBottom: 14, alignItems: "center", gap: 6 },
-  avatar          : { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center", marginBottom: 6, shadowColor: colors.primary, shadowOpacity: 0.35, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
+  
+  avatarContainer : { position: "relative", marginBottom: 6 },
+  avatarImage     : { width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: colors.primary },
+  avatar          : { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center", shadowColor: colors.primary, shadowOpacity: 0.35, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
+  editBadge       : { position: "absolute", bottom: 0, right: -4, backgroundColor: colors.primary, width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: colors.cardBg, elevation: 6, shadowColor: colors.primary, shadowOpacity: 0.4, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
+  
   avatarText      : { fontSize: 28, fontWeight: "800", color: "#FFF" },
   userName        : { fontSize: 20, fontWeight: "800", color: colors.primary },
   emailRow        : { flexDirection: "row", alignItems: "center", gap: 5 },

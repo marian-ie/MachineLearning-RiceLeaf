@@ -71,10 +71,15 @@ function StressCard({ stressKey }) {
                   size={11}
                   color={activeSection === sec.key ? "#fff" : data.color}
                 />
-                <Text style={[
-                  styles.sectionTabText,
-                  { color: activeSection === sec.key ? "#fff" : data.color }
-                ]}>
+                {/* 👇 Added numberOfLines and ellipsizeMode here */}
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={[
+                    styles.sectionTabText,
+                    { color: activeSection === sec.key ? "#fff" : data.color }
+                  ]}
+                >
                   {sec.label}
                 </Text>
               </TouchableOpacity>
@@ -155,15 +160,21 @@ const getStyles = (colors) => StyleSheet.create({
   cardTitle    : { fontSize: 17, fontWeight: "800" },
   severityBadge: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start", borderRadius: 50, paddingHorizontal: 8, paddingVertical: 3, gap: 4 },
   severityText : { fontSize: 11, color: "#fff", fontWeight: "600" },
-  cardBody     : { padding: 16, borderTopWidth: 1, borderTopColor: colors.borderLight, gap: 12 },
-  description  : { fontSize: 13, color: colors.text, lineHeight: 20 },
-  sectionTabs  : { flexDirection: "row", gap: 6 },
-  sectionTab   : { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 50, borderWidth: 1, borderColor: colors.border },
-  sectionTabText: { fontSize: 11, fontWeight: "600" },
-  sectionContent: { gap: 8 },
-  itemRow      : { flexDirection: "row", alignItems: "flex-start", gap: 10 },
-  itemDot      : { width: 7, height: 7, borderRadius: 4, marginTop: 6 },
-  itemText     : { flex: 1, fontSize: 13, color: colors.text, lineHeight: 20 },
+  
+  cardBody     : { padding: 16, borderTopWidth: 1, borderTopColor: colors.borderLight, gap: 18 }, 
+  description  : { fontSize: 13, color: colors.text, lineHeight: 22 }, 
+  
+  // 👇 UPDATED TAB STYLES FOR SINGLE-LINE ELLIPSIS 👇
+  sectionTabs  : { flexDirection: "row", gap: 6 }, // Removed flexWrap: "wrap"
+  sectionTab   : { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, paddingHorizontal: 6, paddingVertical: 8, borderRadius: 50, borderWidth: 1, borderColor: colors.border }, // Added flex: 1
+  sectionTabText: { fontSize: 10, fontWeight: "600", flexShrink: 1 }, // Added flexShrink: 1, reduced font size slightly to fit more text
+  // 👆 --------------------------------- 👆
+
+  sectionContent: { gap: 14 }, 
+  itemRow      : { flexDirection: "row", alignItems: "flex-start", gap: 12 }, 
+  itemDot      : { width: 6, height: 6, borderRadius: 3, marginTop: 8 }, 
+  itemText     : { flex: 1, fontSize: 13, color: colors.text, lineHeight: 22 },
+
   disclaimer   : { flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: colors.droughtBg, borderRadius: 12, padding: 14 },
   disclaimerText: { flex: 1, fontSize: 12, lineHeight: 18 },
 });

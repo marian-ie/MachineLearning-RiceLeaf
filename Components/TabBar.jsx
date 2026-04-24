@@ -1,14 +1,15 @@
 import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faHouse, faMagnifyingGlass, faBookOpen, faChartBar } from "@fortawesome/free-solid-svg-icons";
-import { ThemeContext } from "../App"; // <-- Import Context
+import { faHouse, faMagnifyingGlass, faUser, faChartBar } from "@fortawesome/free-solid-svg-icons";
+import { ThemeContext } from "../App";
 
+// 👇 Swapped Records and Profile placements here
 const TABS = [
   { key: "dashboard", label: "Home",    icon: faHouse           },
   { key: "scan",      label: "Scan",    icon: faMagnifyingGlass },
-  { key: "guide",     label: "Guide",   icon: faBookOpen        },
-  { key: "records",   label: "Records", icon: faChartBar        },
+  { key: "records",   label: "Records", icon: faChartBar        }, 
+  { key: "profile",   label: "Profile", icon: faUser            }, 
 ];
 
 export default function TabBar({ activeTab, onTabPress }) {
@@ -42,7 +43,7 @@ export default function TabBar({ activeTab, onTabPress }) {
 }
 
 const getStyles = (colors) => StyleSheet.create({
-  container : { flexDirection: "row", backgroundColor: colors.cardBg, borderRadius: 50, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: colors.borderLight },
+  container : { flexDirection: "row", backgroundColor: colors.cardBg, borderRadius: 50, padding: 4, borderWidth: 1, borderColor: colors.borderLight },
   tab       : { flex: 1, paddingVertical: 10, borderRadius: 50, alignItems: "center", gap: 3 },
   activeTab : { backgroundColor: colors.primary },
   label     : { fontSize: 11, fontWeight: "600", color: colors.primary },
