@@ -1,9 +1,4 @@
 import { STRESS_LABELS, STRESS_INFO } from "../constants/stressTypes";
-
-/**
- * Deterministic mock model — replace with a real ML inference call.
- * Returns { label, confidence, info }
- */
 export function analyzeImage(uri) {
   let hash = 0;
   for (let i = 0; i < uri.length; i += 1) {

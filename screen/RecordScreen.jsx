@@ -49,7 +49,7 @@ export default function RecordScreen({ userId }) {
       contentContainerStyle={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      {/* Summary */}
+  
       <View style={styles.summaryRow}>
         {[
           { label: "Total Scans",  value: stats.total,                          color: colors.primary,                             bg: colors.cardBg,                                 icon: faChartBar },
@@ -64,7 +64,6 @@ export default function RecordScreen({ userId }) {
         ))}
       </View>
 
-      {/* Distribution */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <FontAwesomeIcon icon={faChartBar} size={15} color={colors.primary} />
@@ -90,7 +89,6 @@ export default function RecordScreen({ userId }) {
         })}
       </View>
 
-      {/* Stress Breakdown */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <FontAwesomeIcon icon={faChartPie} size={15} color={colors.primary} />
@@ -114,7 +112,6 @@ export default function RecordScreen({ userId }) {
         </View>
       </View>
 
-      {/* Activity */}
       {scans.length > 0 && (
         <View style={styles.card}>
           <View style={styles.cardHeader}>

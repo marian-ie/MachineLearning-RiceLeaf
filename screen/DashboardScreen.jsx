@@ -4,12 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faMagnifyingGlass, faSun, faBug, faLeaf, faLightbulb, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
 import { getScanStats } from "../services/database";
-import { ThemeContext } from "../App"; // <-- Import Context
+import { ThemeContext } from "../App"; 
 
 export default function DashboardScreen({ history, prediction, onScanPress, userId }) {
-  const { isDark, colors } = useContext(ThemeContext); // <-- Get dynamic colors
-  const dynamicClassColors = CLASS_COLORS(isDark);     // <-- Get dynamic class colors
-  const styles = getStyles(colors);                    // <-- Generate dynamic styles
+  const { isDark, colors } = useContext(ThemeContext); 
+  const dynamicClassColors = CLASS_COLORS(isDark);     
+  const styles = getStyles(colors);                   
 
   const [stats, setStats] = useState({ total: 0, drought: 0, pest: 0, healthy: 0 });
 
@@ -42,7 +42,6 @@ export default function DashboardScreen({ history, prediction, onScanPress, user
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      {/* Latest Result */}
       <View style={styles.resultCard}>
         <Text style={styles.cardTitle}>Scan Result</Text>
         {!prediction ? (
@@ -67,13 +66,11 @@ export default function DashboardScreen({ history, prediction, onScanPress, user
         )}
       </View>
 
-      {/* Scan Now */}
       <TouchableOpacity style={styles.scanBtn} onPress={onScanPress} activeOpacity={0.85}>
         <FontAwesomeIcon icon={faMagnifyingGlass} size={16} color={colors.white} />
         <Text style={styles.scanBtnText}>Scan a Plant Now</Text>
       </TouchableOpacity>
 
-      {/* Stats */}
       <View style={styles.statsCard}>
         <Text style={styles.cardTitle}>Detection Summary</Text>
         <View style={styles.statsRow}>
@@ -87,7 +84,6 @@ export default function DashboardScreen({ history, prediction, onScanPress, user
         </View>
       </View>
 
-      {/* Tips */}
       <View style={styles.tipsCard}>
         <View style={styles.tipsHeader}>
           <FontAwesomeIcon icon={faLightbulb} size={16} color={colors.primary} />
@@ -104,7 +100,6 @@ export default function DashboardScreen({ history, prediction, onScanPress, user
   );
 }
 
-// Wrap styles in a function that accepts dynamic colors
 const getStyles = (colors) => StyleSheet.create({
   resultCard  : { backgroundColor: colors.cardBg, borderRadius: 16, padding: 18, marginBottom: 14 },
   cardTitle   : { fontSize: 17, fontWeight: "700", color: colors.primary, marginBottom: 14 },

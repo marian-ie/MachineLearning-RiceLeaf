@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHouse, faMagnifyingGlass, faUser, faChartBar } from "@fortawesome/free-solid-svg-icons";
 import { ThemeContext } from "../App";
 
-// 👇 Swapped Records and Profile placements here
 const TABS = [
   { key: "dashboard", label: "Home",    icon: faHouse           },
   { key: "scan",      label: "Scan",    icon: faMagnifyingGlass },

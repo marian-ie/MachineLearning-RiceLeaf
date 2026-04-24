@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faTrash, faSun, faBug, faLeaf, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { getAllScans, deleteScan, clearAllScans } from "../services/database";
 import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
-import { ThemeContext } from "../App"; // <-- Import Context
+import { ThemeContext } from "../App"; 
 
 export default function HistoryScreen({ userId }) {
   const { isDark, colors } = useContext(ThemeContext);

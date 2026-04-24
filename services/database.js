@@ -1,7 +1,6 @@
 import * as SQLite from "expo-sqlite";
 import bcrypt from "bcryptjs";
 
-// 👇 FIX: Tell bcrypt how to generate random numbers in React Native
 bcrypt.setRandomFallback((len) => {
   const randomBytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
@@ -9,7 +8,6 @@ bcrypt.setRandomFallback((len) => {
   }
   return randomBytes;
 });
-// 👆 -----------------------------------------------------------
 
 let db;
 
@@ -42,11 +40,9 @@ export const initDatabase = async () => {
     );
   `);
 
-  // 👇 FIX: Safely add the column to existing databases without deleting user data!
   try {
     await db.execAsync("ALTER TABLE users ADD COLUMN profile_pic TEXT;");
   } catch (error) {
-    // If it throws an error, it just means the column already exists. We can ignore it!
   }
 
   console.log("Database ready and refreshed!");
@@ -81,7 +77,7 @@ export const loginUser = async (username, password) => {
         id: user.id, 
         name: user.name, 
         email: user.username,
-        profilePic: user.profile_pic // Pass the picture to the app!
+        profilePic: user.profile_pic 
       } 
     };
   }

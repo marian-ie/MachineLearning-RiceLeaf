@@ -43,7 +43,6 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
   const { colors } = useContext(ThemeContext);
   const styles = getStyles(colors);
 
-  // Load the saved picture if they have one, otherwise null
   const [profilePic,   setProfilePic]   = useState(user?.profilePic || null);
 
   const [pwModal,      setPwModal]      = useState(false);
@@ -81,13 +80,10 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
       if (!result.canceled) {
         const newImageUri = result.assets[0].uri;
         
-        // 1. Update the UI instantly
         setProfilePic(newImageUri); 
         
-        // 2. Update the user session object so it doesn't disappear when navigating tabs
         if (user) user.profilePic = newImageUri; 
 
-        // 3. Save it permanently to the database
         const dbResult = await updateProfilePic(user.id, newImageUri);
         if (!dbResult.success) {
           Alert.alert("Notice", "Profile picture updated, but failed to save to database: " + dbResult.error);
@@ -126,7 +122,6 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
     <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
       <View style={styles.profileCard}>
         
-        {/* Avatar Container with Floating Camera Icon */}
         <View style={styles.avatarContainer}>
           {profilePic ? (
             <Image source={{ uri: profilePic }} style={styles.avatarImage} />
@@ -188,7 +183,6 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
       </TouchableOpacity>
       <Text style={styles.version}>Rice Stress Lab v1.0.0</Text>
 
-      {/* Change Password Modal */}
       <Modal visible={pwModal} transparent animationType="slide" onRequestClose={() => setPwModal(false)}>
         <KeyboardAvoidingView style={styles.modalOverlay} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <View style={styles.modalCard}>
@@ -215,7 +209,6 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Delete Account Modal */}
       <Modal visible={deleteModal} transparent animationType="slide" onRequestClose={() => setDeleteModal(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -240,8 +233,7 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
           </View>
         </View>
       </Modal>
-
-      {/* Logout Modal */}
+      
       <Modal visible={logoutModal} transparent animationType="fade" onRequestClose={() => setLogoutModal(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalCard, { paddingBottom: 22 }]}>

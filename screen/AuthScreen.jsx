@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-// 👇 Added Image to the imports
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Animated, Image } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faLeaf, faEnvelope, faLock, faEye, faEyeSlash, faUser, faRightToBracket, faUserPlus } from "@fortawesome/free-solid-svg-icons";
@@ -159,14 +158,12 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.brand}>
           
-          {/* 👇 Replaced the old logoBox with your new custom Image */}
           <Image 
             source={require('../assets/logo.jpg')} 
             style={styles.logoImage} 
             resizeMode="contain" 
           />
-          {/* 👆 --------------------------------------------------- 👆 */}
-
+          
           <Text style={styles.appName}>Rice Stress Lab</Text>
           <Text style={styles.appSub}>Rice plant stress analytics</Text>
         </View>
@@ -254,7 +251,6 @@ const getStyles = (colors) => StyleSheet.create({
   scroll       : { paddingHorizontal: 18, paddingTop: 52, paddingBottom: 32 },
   brand        : { alignItems: "center", marginBottom: 28 },
   
-  // 👇 Replaced logoBox styles with logoImage styles
   logoImage    : { width: 120, height: 120, borderRadius: 24, marginBottom: 12, backgroundColor: "#FFF" },
   
   appName      : { fontSize: 24, fontWeight: "800", color: colors.primary, letterSpacing: 0.3 },

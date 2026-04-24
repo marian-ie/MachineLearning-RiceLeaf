@@ -13,7 +13,7 @@ export default function CameraGuideModal({ visible, onClose, onContinue }) {
       icon   : faRuler,
       title  : "Distance",
       color  : "#1565C0",
-      bg     : colors.isDark ? "#0D47A1" : "#E3F2FD", // Adapted for dark mode
+      bg     : colors.isDark ? "#0D47A1" : "#E3F2FD", 
       tip    : "Hold your phone 20–30 cm (about 1 foot) away from the leaf.",
       good   : "Leaf fills most of the frame",
       bad    : "Too close (blurry) or too far (leaf too small)",

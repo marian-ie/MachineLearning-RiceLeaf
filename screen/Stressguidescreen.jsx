@@ -71,7 +71,6 @@ function StressCard({ stressKey }) {
                   size={11}
                   color={activeSection === sec.key ? "#fff" : data.color}
                 />
-                {/* 👇 Added numberOfLines and ellipsizeMode here */}
                 <Text
                   numberOfLines={1}
                   ellipsizeMode="tail"
@@ -164,11 +163,9 @@ const getStyles = (colors) => StyleSheet.create({
   cardBody     : { padding: 16, borderTopWidth: 1, borderTopColor: colors.borderLight, gap: 18 }, 
   description  : { fontSize: 13, color: colors.text, lineHeight: 22 }, 
   
-  // 👇 UPDATED TAB STYLES FOR SINGLE-LINE ELLIPSIS 👇
-  sectionTabs  : { flexDirection: "row", gap: 6 }, // Removed flexWrap: "wrap"
+  sectionTabs  : { flexDirection: "row", gap: 6 }, 
   sectionTab   : { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, paddingHorizontal: 6, paddingVertical: 8, borderRadius: 50, borderWidth: 1, borderColor: colors.border }, // Added flex: 1
-  sectionTabText: { fontSize: 10, fontWeight: "600", flexShrink: 1 }, // Added flexShrink: 1, reduced font size slightly to fit more text
-  // 👆 --------------------------------- 👆
+  sectionTabText: { fontSize: 10, fontWeight: "600", flexShrink: 1 }, 
 
   sectionContent: { gap: 14 }, 
   itemRow      : { flexDirection: "row", alignItems: "flex-start", gap: 12 }, 

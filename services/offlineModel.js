@@ -13,22 +13,17 @@ const STD         = [0.229, 0.224, 0.225];
 let model      = null;
 let modelReady = false;
 
-// ══════════════════════════════════════════════════════════════
-// Load model — uses Asset.fromURI instead of require()
-// ══════════════════════════════════════════════════════════════
 export const loadModel = async () => {
   if (modelReady && model) return model;
 
   await tf.ready();
 
-  // ── Download asset to local cache via its bundled URI ──────
-  // This avoids require() which Expo bundler can't handle for .tflite
   const [asset] = await Asset.Asset.loadAsync(
     Asset.Asset.fromMetadata({
       name  : "rice_model",
       type  : "tflite",
       hash  : null,
-      uri   : "rice_model.tflite",   // relative to assets/ folder
+      uri   : "rice_model.tflite",   
       width : null,
       height: null,
     })
@@ -37,14 +32,13 @@ export const loadModel = async () => {
   const modelUri  = asset.localUri ?? asset.uri;
   const cacheUri  = `${FileSystem.cacheDirectory}rice_model.tflite`;
 
-  // Copy to cache if not already there
   const existing = await FileSystem.getInfoAsync(cacheUri);
   if (!existing.exists) {
     await FileSystem.copyAsync({ from: modelUri, to: cacheUri });
   }
 
   model = await tf.loadGraphModel(
-    tf.io.fromMemory   // avoid file:// path issues on Android
+    tf.io.fromMemory   
       ? `file://${cacheUri}`
       : cacheUri,
     { fromTFHub: false }
@@ -55,9 +49,6 @@ export const loadModel = async () => {
   return model;
 };
 
-// ══════════════════════════════════════════════════════════════
-// Preprocess: URI → normalized [1, 3, 224, 224] tensor
-// ══════════════════════════════════════════════════════════════
 const preprocessImage = async (imageUri) => {
   const { base64 } = await manipulateAsync(
     imageUri,
@@ -81,9 +72,6 @@ const preprocessImage = async (imageUri) => {
   });
 };
 
-// ══════════════════════════════════════════════════════════════
-// Predict — returns same shape as original api.js response
-// ══════════════════════════════════════════════════════════════
 export const predictImage = async (imageUri) => {
   try {
     const net    = await loadModel();
@@ -127,9 +115,6 @@ export const predictImage = async (imageUri) => {
   }
 };
 
-// ══════════════════════════════════════════════════════════════
-// Recommendations
-// ══════════════════════════════════════════════════════════════
 const getRecommendation = (className, isUncertain) => {
   if (isUncertain)
     return "Low confidence — recommend manual inspection by agronomist";

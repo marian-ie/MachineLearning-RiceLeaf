@@ -103,7 +103,6 @@ export default function App() {
     }
   };
 
-  // Ensure active tab state stays aligned
   const tabForBar = activeTab;
 
   return (
@@ -121,20 +120,17 @@ export default function App() {
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.appBg }]}>
           <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={colors.appBg} />
 
-          {/* 👇 AppHeader stays at the top */}
           <View style={styles.topBar}>
             <AppHeader 
               onHistoryPress={handleHistoryPress} 
-              onGuidePress={() => setActiveTab("guide")} // Swapped Profile for Guide
+              onGuidePress={() => setActiveTab("guide")}
             />
           </View>
 
-          {/* Screen content takes up the middle */}
           <View style={styles.screenContainer}>
             {renderScreen()}
           </View>
 
-          {/* 👇 TabBar gets its own view at the bottom! */}
           <View style={styles.bottomBar}>
             <TabBar activeTab={tabForBar} onTabPress={setActiveTab} />
           </View>

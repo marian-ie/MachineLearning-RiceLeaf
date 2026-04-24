@@ -1,6 +1,3 @@
-// ⚠️ CHANGE THIS to your computer's local IP address
-// Open cmd → type ipconfig → look for IPv4 Address
-// Example: 192.168.1.5  (NOT localhost or 127.0.0.1)
 const API_BASE_URL = "https://marian522-ricestressclassification.hf.space";
 
 export const checkServerHealth = async () => {

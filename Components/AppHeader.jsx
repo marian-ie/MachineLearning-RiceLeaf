@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faClipboardList, faBookOpen } from "@fortawesome/free-solid-svg-icons"; // 👇 Swapped faUser to faBookOpen
+import { faClipboardList, faBookOpen } from "@fortawesome/free-solid-svg-icons"; 
 import { ThemeContext } from "../App";
 
-export default function AppHeader({ onHistoryPress, onGuidePress }) { // 👇 Swapped prop name
+export default function AppHeader({ onHistoryPress, onGuidePress }) { 
   const { colors } = useContext(ThemeContext);
   const styles = getStyles(colors);
 
   return (
     <View style={styles.header}>
-      {/* Logo + Title */}
+     
       <View style={styles.left}>
         
         <View style={styles.titleBox}>
@@ -19,12 +19,12 @@ export default function AppHeader({ onHistoryPress, onGuidePress }) { // 👇 Sw
         </View>
       </View>
 
-      {/* Buttons */}
+    
       <View style={styles.rightButtons}>
         <TouchableOpacity style={styles.iconBtn} onPress={onHistoryPress} activeOpacity={0.8}>
           <FontAwesomeIcon icon={faClipboardList} size={20} color={colors.primary} />
         </TouchableOpacity>
-        {/* 👇 Updated to Guide Button */}
+       
         <TouchableOpacity style={styles.iconBtn} onPress={onGuidePress} activeOpacity={0.8}>
           <FontAwesomeIcon icon={faBookOpen} size={18} color={colors.primary} /> 
         </TouchableOpacity>

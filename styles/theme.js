@@ -1,4 +1,3 @@
-// 1. Define the base light colors (your original colors)
 const lightColors = {
   appBg        : "#F2F2F2",
   pageBg       : "#F2F2F2",
@@ -27,7 +26,6 @@ const lightColors = {
   modalOverlay : "rgba(0,0,0,0.45)",
 };
 
-// 2. Define the dark mode counterparts
 const darkColors = {
   appBg        : "#121212",
   pageBg       : "#121212",
@@ -56,7 +54,6 @@ const darkColors = {
   modalOverlay : "rgba(0,0,0,0.75)",
 };
 
-// 3. Create a function to get the correct colors
 export const getColors = (isDark) => isDark ? darkColors : lightColors;
 
 export const CLASS_COLORS = (isDark) => {
@@ -74,7 +71,6 @@ export const CLASS_FA_ICONS = {
   Healthy        : "leaf",
 };
 
-// 4. Fully written out STRESS_DATA so nothing is undefined!
 export const getStressData = (isDark) => {
   const c = getColors(isDark);
   return {
