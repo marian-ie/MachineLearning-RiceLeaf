@@ -28,7 +28,11 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "04b4bdab-63bc-4eb7-b5cd-e0ba0d6d9023"
+      }
     }
-   
   }
 }
