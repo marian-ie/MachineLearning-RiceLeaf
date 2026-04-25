@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faRuler, faRotate, faSun, faCircleCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 export default function CameraGuideModal({ visible, onClose, onContinue }) {
   const { colors } = useContext(ThemeContext);
@@ -43,7 +43,7 @@ export default function CameraGuideModal({ visible, onClose, onContinue }) {
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>📷 Before You Scan</Text>
+            <Text style={styles.modalTitle}>Before You Scan</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
               <FontAwesomeIcon icon={faXmark} size={18} color={colors.textLight} />
             </TouchableOpacity>
@@ -72,7 +72,7 @@ export default function CameraGuideModal({ visible, onClose, onContinue }) {
             ))}
 
             <View style={styles.exampleBox}>
-              <Text style={styles.exampleTitle}>✅ Perfect Shot Checklist</Text>
+              <Text style={styles.exampleTitle}>Perfect Shot Checklist</Text>
               {[
                 "Single leaf visible and in focus",
                 "Natural green background preferred",

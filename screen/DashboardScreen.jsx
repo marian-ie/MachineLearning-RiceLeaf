@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faMagnifyingGlass, faSun, faBug, faLeaf, faLightbulb, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
 import { getScanStats } from "../services/database";
-import { ThemeContext } from "../App"; 
+import { ThemeContext } from "../ThemeContext"; 
 
 export default function DashboardScreen({ history, prediction, onScanPress, userId }) {
   const { isDark, colors } = useContext(ThemeContext); 
@@ -86,7 +86,6 @@ export default function DashboardScreen({ history, prediction, onScanPress, user
 
       <View style={styles.tipsCard}>
         <View style={styles.tipsHeader}>
-          <FontAwesomeIcon icon={faLightbulb} size={16} color={colors.primary} />
           <Text style={styles.cardTitle}>Quick Tips</Text>
         </View>
         {TIPS.map((tip, i) => (

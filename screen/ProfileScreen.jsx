@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Switch
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faRightFromBracket, faSun, faMoon, faTrash, faChevronRight, faShield, faCircleXmark, faFloppyDisk, faCamera } from "@fortawesome/free-solid-svg-icons";
 import { changeUserPassword, updateProfilePic } from "../services/database.js";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 import * as ImagePicker from 'expo-image-picker';
 
 const PwField = ({ icon, placeholder, value, onChangeText, secure, toggle, styles, colors }) => (
@@ -192,7 +192,7 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
                 <Text style={styles.modalTitle}>Change Password</Text>
               </View>
               <TouchableOpacity onPress={() => setPwModal(false)}>
-                <FontAwesomeIcon icon={faCircleXmark} size={20} color={colors.textLight} />
+                <FontAwesomeIcon icon={faCircleXmark} size={20} color={colors.textLight}/>
               </TouchableOpacity>
             </View>
             <Text style={styles.modalSub}>Enter your current password then choose a new one.</Text>
@@ -236,7 +236,7 @@ export default function ProfileScreen({ user, isDark, onToggleTheme, onLogout, o
       
       <Modal visible={logoutModal} transparent animationType="fade" onRequestClose={() => setLogoutModal(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { paddingBottom: 22 }]}>
+          <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <View style={styles.modalTitleRow}>
                 <FontAwesomeIcon icon={faRightFromBracket} size={16} color={colors.primary} />
@@ -285,8 +285,19 @@ const getStyles = (colors) => StyleSheet.create({
   logoutBtnText   : { color: colors.white, fontWeight: "700", fontSize: 15 },
   version         : { textAlign: "center", fontSize: 11, color: colors.textLight, marginBottom: 30 },
   modalOverlay    : { flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" },
-  modalCard       : { backgroundColor: colors.cardBg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, gap: 14 },
-  modalHeader     : { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  modalCard       : { 
+    backgroundColor: colors.cardBg, 
+    borderTopLeftRadius: 24, 
+    borderTopRightRadius: 24, 
+    padding: 22, 
+    paddingBottom: Platform.OS === "ios" ? 40 : 36, 
+    gap: 14 
+  },
+  modalHeader: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between" 
+  },
   modalTitleRow   : { flexDirection: "row", alignItems: "center", gap: 8 },
   modalTitle      : { fontSize: 17, fontWeight: "800", color: colors.primary },
   modalSub        : { fontSize: 13, color: colors.textLight, lineHeight: 20 },

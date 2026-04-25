@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChartBar, faSun, faBug, faLeaf, faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { getAllScans, getScanStats } from "../services/database";
 import { CLASS_COLORS } from "../styles/theme";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 export default function RecordScreen({ userId }) {
   const { isDark, colors } = useContext(ThemeContext);

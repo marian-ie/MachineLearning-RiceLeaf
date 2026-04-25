@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, RefreshControl } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, RefreshControl, Modal, ScrollView } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faTrash, faSun, faBug, faLeaf, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faSun, faBug, faLeaf, faClockRotateLeft, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { getAllScans, deleteScan, clearAllScans } from "../services/database";
 import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
-import { ThemeContext } from "../App"; 
+import { ThemeContext } from "../ThemeContext"; 
 
 export default function HistoryScreen({ userId }) {
   const { isDark, colors } = useContext(ThemeContext);
@@ -13,6 +13,7 @@ export default function HistoryScreen({ userId }) {
 
   const [scans, setScans]           = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedScan, setSelectedScan] = useState(null);
 
   const loadScans = useCallback(async () => { 
     setScans(await getAllScans(userId)); 
@@ -48,7 +49,7 @@ export default function HistoryScreen({ userId }) {
     const clr    = dynamicClassColors[item.display_name] || dynamicClassColors.Healthy;
     const faIcon = faIconMap[CLASS_FA_ICONS[item.display_name]] || faLeaf;
     return (
-      <View style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => setSelectedScan(item)} activeOpacity={0.7}>
         {item.image_uri ? (
           <Image source={{ uri: item.image_uri }} style={styles.thumb} />
         ) : (
@@ -69,7 +70,7 @@ export default function HistoryScreen({ userId }) {
         <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteBtn}>
           <FontAwesomeIcon icon={faTrash} size={15} color={colors.pestBorder} />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -86,6 +87,52 @@ export default function HistoryScreen({ userId }) {
           </TouchableOpacity>
         )}
       </View>
+
+      <Modal visible={!!selectedScan} transparent animationType="fade" onRequestClose={() => setSelectedScan(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.detailsCard}>
+            
+            <View style={styles.detailsHeader}>
+              <Text style={styles.detailsTitle}>Scan Details</Text>
+              <TouchableOpacity onPress={() => setSelectedScan(null)} style={{ padding: 4 }}>
+                <FontAwesomeIcon icon={faCircleXmark} size={24} color={colors.textLight} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
+              {selectedScan?.image_uri ? (
+                <Image source={{ uri: selectedScan.image_uri }} style={styles.detailsImage} />
+              ) : (
+                <View style={[styles.detailsImage, styles.thumbPlaceholder, { backgroundColor: colors.borderLight }]}>
+                  <FontAwesomeIcon icon={faLeaf} size={40} color={colors.textLight} />
+                </View>
+              )}
+
+              <View style={[styles.badge, { 
+                backgroundColor: selectedScan ? (dynamicClassColors[selectedScan.display_name]?.bg || colors.borderLight) : colors.borderLight, 
+                borderColor: selectedScan ? (dynamicClassColors[selectedScan.display_name]?.border || colors.border) : colors.border,
+                alignSelf: "flex-start", marginTop: 16, marginBottom: 8 
+              }]}>
+                <Text style={[styles.badgeText, { 
+                  color: selectedScan ? (dynamicClassColors[selectedScan.display_name]?.text || colors.text) : colors.text 
+                }]}>
+                  {selectedScan?.display_name}
+                </Text>
+              </View>
+
+              <Text style={styles.detailsConfidence}>{selectedScan?.confidence}% Confidence</Text>
+              {selectedScan?.is_uncertain && <Text style={styles.uncertainTag}>⚠ Low confidence — recommend manual inspection</Text>}
+              <Text style={styles.detailsTimestamp}>{selectedScan ? formatDate(selectedScan.timestamp) : ""}</Text>
+
+              <View style={styles.divider} />
+
+              <Text style={styles.detailsSectionTitle}>Recommendation</Text>
+              <Text style={styles.detailsRecommendation}>{selectedScan?.recommendation}</Text>
+            </ScrollView>
+
+          </View>
+        </View>
+      </Modal>
 
       {scans.length === 0 ? (
         <View style={styles.emptyCard}>
@@ -127,4 +174,15 @@ const getStyles = (colors) => StyleSheet.create({
   emptyCard      : { backgroundColor: colors.cardBg, borderRadius: 16, padding: 40, alignItems: "center", marginTop: 20, gap: 10 },
   emptyText      : { fontSize: 18, fontWeight: "700", color: colors.text },
   emptySub       : { fontSize: 13, color: colors.textLight, textAlign: "center", lineHeight: 20 },
+
+  modalOverlay     : { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center", padding: 20 },
+  detailsCard      : { backgroundColor: colors.cardBg, borderRadius: 20, width: "100%", maxHeight: "85%", padding: 20, elevation: 5, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 10 },
+  detailsHeader    : { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  detailsTitle     : { fontSize: 18, fontWeight: "800", color: colors.primary },
+  detailsImage     : { width: "100%", height: 250, borderRadius: 14, backgroundColor: colors.borderLight },
+  detailsConfidence: { fontSize: 16, fontWeight: "700", color: colors.text, marginTop: 4 },
+  detailsTimestamp : { fontSize: 13, color: colors.textMuted, marginTop: 4 },
+  divider          : { height: 1, backgroundColor: colors.borderLight, marginVertical: 16 },
+  detailsSectionTitle: { fontSize: 14, fontWeight: "700", color: colors.primary, marginBottom: 8 },
+  detailsRecommendation: { fontSize: 14, color: colors.text, lineHeight: 22 },
 });

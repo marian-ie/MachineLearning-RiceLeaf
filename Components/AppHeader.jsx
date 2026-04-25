@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClipboardList, faBookOpen } from "@fortawesome/free-solid-svg-icons"; 
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 export default function AppHeader({ onHistoryPress, onGuidePress }) { 
   const { colors } = useContext(ThemeContext);

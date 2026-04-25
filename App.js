@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, createContext } from "react";
-import { SafeAreaView, View, StatusBar, StyleSheet, Text, Alert, Platform } from "react-native";
+import { View, StatusBar, StyleSheet, Text, Alert, Platform } from "react-native";
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,10 +18,11 @@ import ProfileScreen     from "./screen/ProfileScreen";
 
 import { initDatabase, deleteUserAccount }  from "./services/database";
 import { getColors }        from "./styles/theme";
+import { ThemeContext } from './ThemeContext';
 
 library.add(fas);
 
-export const ThemeContext = createContext();
+
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -108,16 +110,16 @@ export default function App() {
   return (
     <ThemeContext.Provider value={{ isDark: isDarkTheme, colors }}>
       {!dbReady ? (
-        <SafeAreaView style={[styles.loading, { backgroundColor: colors.appBg }]}>
+        <SafeAreaProvider style={[styles.loading, { backgroundColor: colors.appBg }]}>
           <Text style={{ fontSize: 48 }}>🌾</Text>
           <Text style={{ color: colors.textLight, marginTop: 12, fontSize: 15 }}>
             Loading Rice Stress Lab...
           </Text>
-        </SafeAreaView>
+        </SafeAreaProvider>
       ) : !currentUser ? (
         <AuthScreen onLoginSuccess={handleLoginSuccess} />
       ) : (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.appBg }]}>
+        <SafeAreaProvider style={[styles.safeArea, { backgroundColor: colors.appBg }]}>
           <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={colors.appBg} />
 
           <View style={styles.topBar}>
@@ -135,7 +137,7 @@ export default function App() {
             <TabBar activeTab={tabForBar} onTabPress={setActiveTab} />
           </View>
 
-        </SafeAreaView>
+        </SafeAreaProvider>
       )}
     </ThemeContext.Provider>
   );

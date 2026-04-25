@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Keyboa
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faLeaf, faEnvelope, faLock, faEye, faEyeSlash, faUser, faRightToBracket, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { registerUser, loginUser } from "../services/database.js";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 const Field = ({ icon, placeholder, value, onChangeText, secureEntry, toggleSecure, showToggle, keyboardType = "default", styles, colors }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -144,18 +144,32 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
     setIsLoading(false); 
     
     if (result.success) {
-      Alert.alert("Success", "Account created successfully!");
-      if (onLoginSuccess) {
-        onLoginSuccess({ id: result.userId, username: regEmail, name: fullName });
-      }
+      Alert.alert("Success", "Registration Successfully!");
+      
+      setRegFirstName("");
+      setRegMiddleName("");
+      setRegLastName("");
+      setRegSuffix("");
+      setRegPassword("");
+      setRegConfirm("");
+      
+      setLoginEmail(regEmail);
+      setRegEmail("");
+      
+      setActiveTab("login");
+      
     } else {
       Alert.alert("Registration Failed", result.error);
     }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <ScrollView 
+        contentContainerStyle={styles.scroll} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.brand}>
           
           <Image 
@@ -248,7 +262,7 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
 
 const getStyles = (colors) => StyleSheet.create({
   screen       : { flex: 1, backgroundColor: colors.appBg },
-  scroll       : { paddingHorizontal: 18, paddingTop: 52, paddingBottom: 32 },
+  scroll       : { paddingHorizontal: 18, paddingTop: 52, paddingBottom: 120 }, 
   brand        : { alignItems: "center", marginBottom: 28 },
   
   logoImage    : { width: 120, height: 120, borderRadius: 24, marginBottom: 12, backgroundColor: "#FFF" },

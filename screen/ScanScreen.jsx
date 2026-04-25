@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import {
   View, Text, TouchableOpacity, Image,
-  ActivityIndicator, StyleSheet, Alert, ScrollView,
+  ActivityIndicator, StyleSheet, Alert, ScrollView, Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -14,7 +14,7 @@ import { predictImage, checkServerHealth } from "../services/api";
 import { saveScan } from "../services/database";
 import { CLASS_COLORS, CLASS_FA_ICONS } from "../styles/theme";
 import CameraGuideModal from "../Components/cameraguideModal";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 export default function ScanScreen({ onNewScan, userId }) {
   const { isDark, colors } = useContext(ThemeContext);
@@ -130,11 +130,6 @@ export default function ScanScreen({ onNewScan, userId }) {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.testBtn} onPress={testConnection}>
-          <FontAwesomeIcon icon={faWifi} size={13} color={colors.primary} />
-          <Text style={styles.testBtnText}>Test Server Connection</Text>
-        </TouchableOpacity>
-
         {loading && (
           <View style={styles.loadingBox}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -146,9 +141,8 @@ export default function ScanScreen({ onNewScan, userId }) {
           <View style={styles.errorBox}>
             <FontAwesomeIcon icon={faTriangleExclamation} size={16} color={colors.pestBorder} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.errorTitle}>Connection Error</Text>
+              <Text style={styles.errorTitle}>Unable to Analyze Rice Leaf</Text>
               <Text style={styles.errorText}>{error}</Text>
-              <Text style={styles.errorHint}>Check Flask is running and IP is correct in services/api.js</Text>
             </View>
           </View>
         )}
@@ -265,7 +259,7 @@ export default function ScanScreen({ onNewScan, userId }) {
 }
 
 const getStyles = (colors) => StyleSheet.create({
-  container      : { paddingBottom: 32 },
+  container      : { paddingBottom: Platform.OS === "ios" ? 40 : 36, },
   buttonRow      : { flexDirection: "row", gap: 12, marginBottom: 14 },
   uploadBtn      : { flex: 1, backgroundColor: colors.primary, borderRadius: 12, paddingVertical: 15, alignItems: "center", flexDirection: "row", justifyContent: "center", gap: 8 },
   uploadBtnText  : { color: colors.white, fontWeight: "700", fontSize: 14 },

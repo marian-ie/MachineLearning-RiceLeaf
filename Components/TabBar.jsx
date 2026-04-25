@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHouse, faMagnifyingGlass, faUser, faChartBar } from "@fortawesome/free-solid-svg-icons";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 const TABS = [
   { key: "dashboard", label: "Home",    icon: faHouse           },

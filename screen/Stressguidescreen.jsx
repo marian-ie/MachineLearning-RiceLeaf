@@ -9,7 +9,7 @@ import {
   faCircleDot, faFlask, faListCheck, faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { getStressData } from "../styles/theme";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../ThemeContext"; 
 
 const STRESS_KEYS = ["Drought", "PestInfestation", "Healthy"];
 
@@ -108,26 +108,12 @@ export default function StressGuideScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.headerBox}>
-        <FontAwesomeIcon icon={faLeaf} size={20} color={colors.primary} />
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>Stress Guide</Text>
           <Text style={styles.headerSub}>
             Learn about rice stress types, symptoms, and treatments
           </Text>
         </View>
-      </View>
-
-      <View style={styles.legendRow}>
-        {[
-          { label: "Drought",  color: colors.droughtBorder, icon: faSun  },
-          { label: "Pest",     color: colors.pestBorder,    icon: faBug  },
-          { label: "Healthy",  color: colors.healthyBorder, icon: faLeaf },
-        ].map((item) => (
-          <View key={item.label} style={styles.legendItem}>
-            <FontAwesomeIcon icon={item.icon} size={14} color={item.color} />
-            <Text style={[styles.legendText, { color: item.color }]}>{item.label}</Text>
-          </View>
-        ))}
       </View>
 
       {STRESS_KEYS.map((key) => (
