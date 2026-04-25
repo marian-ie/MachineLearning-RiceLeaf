@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Animated, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Animated, Image, Modal } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faLeaf, faEnvelope, faLock, faEye, faEyeSlash, faUser, faRightToBracket, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { registerUser, loginUser, resetPasswordViaEmail } from "../services/database.js";
@@ -185,10 +185,10 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
     if (result.success) {
       Alert.alert("Success", "Your password has been reset successfully. Please log in.");
       setForgotModalVisible(false);
+      setLoginEmail(forgotEmail); 
+      
       setForgotEmail("");
       setForgotNewPassword("");
-
-      setLoginEmail(forgotEmail); 
     } else {
       Alert.alert("Reset Failed", result.error);
     }

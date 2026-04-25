@@ -119,7 +119,9 @@ export const saveScan = async (scanData, userId) => {
 };
 
 export const getAllScans = async (userId) => {
+  if (!userId) return []; 
   if (!db) await initDatabase();
+  
   const rows = await db.getAllAsync(
     "SELECT * FROM scan_history WHERE user_id = ? ORDER BY id DESC", 
     [userId]
@@ -147,7 +149,9 @@ export const clearAllScans = async (userId) => {
 };
 
 export const getScanStats = async (userId) => {
+  if (!userId) return { total: 0, drought: 0, pest: 0, healthy: 0 }; 
   if (!db) await initDatabase();
+  
   const total   = await db.getFirstAsync("SELECT COUNT(*) as count FROM scan_history WHERE user_id = ?", [userId]);
   const drought = await db.getFirstAsync("SELECT COUNT(*) as count FROM scan_history WHERE display_name = 'Drought' AND user_id = ?", [userId]);
   const pest    = await db.getFirstAsync("SELECT COUNT(*) as count FROM scan_history WHERE display_name = 'PestInfestation' AND user_id = ?", [userId]);
@@ -160,7 +164,6 @@ export const getScanStats = async (userId) => {
     healthy: healthy?.count ?? 0,
   };
 };
-
 export const changeUserPassword = async (userId, currentPassword, newPassword) => {
   if (!db) await initDatabase();
   

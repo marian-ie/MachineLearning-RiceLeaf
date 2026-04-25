@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faUpload, faCamera, faMagnifyingGlass, faChevronDown,
   faChevronUp, faTriangleExclamation, faCircleCheck,
-  faWifi, faFloppyDisk, faRotateRight,
+  faWifi, faFloppyDisk, faRotateRight, faSun, faBug, faLeaf,
 } from "@fortawesome/free-solid-svg-icons";
 import { predictImage, checkServerHealth } from "../services/api";
 import { saveScan } from "../services/database";
@@ -92,7 +92,9 @@ export default function ScanScreen({ onNewScan, userId }) {
   };
 
   const clr  = result ? dynamicClassColors[result.display_name] || dynamicClassColors.Healthy : null;
-  const faIcon = result ? CLASS_FA_ICONS[result.display_name] || "leaf" : null;
+  const faIconMap = { sun: faSun, bug: faBug, leaf: faLeaf };
+  const iconString = result ? CLASS_FA_ICONS[result.display_name] || "leaf" : "leaf";
+  const CurrentIcon = faIconMap[iconString] || faLeaf;
 
   return (
     <>
@@ -163,7 +165,7 @@ export default function ScanScreen({ onNewScan, userId }) {
           {result && clr && (
             <View style={styles.resultContent}>
               <View style={[styles.classBadge, { backgroundColor: clr.bg, borderColor: clr.border }]}>
-                <FontAwesomeIcon icon={["fas", faIcon]} size={22} color={clr.text} />
+                <FontAwesomeIcon icon={CurrentIcon} size={22} color={clr.text} />
                 <Text style={[styles.classLabel, { color: clr.text }]}>
                   {result.display_name}
                 </Text>
@@ -207,10 +209,11 @@ export default function ScanScreen({ onNewScan, userId }) {
                   {Object.entries(result.all_probabilities).map(([cls, prob]) => {
                     const name = cls.replace("ClassA-","").replace("ClassB-","").replace("ClassC-","");
                     const c    = dynamicClassColors[name] || dynamicClassColors.Healthy;
-                    const fi   = CLASS_FA_ICONS[name] || "leaf";
+                    const fiString = CLASS_FA_ICONS[name] || "leaf";
+                    const RowIcon = faIconMap[fiString] || faLeaf;
                     return (
                       <View key={cls} style={styles.probRow}>
-                        <FontAwesomeIcon icon={["fas", fi]} size={13} color={c.text} />
+                        <FontAwesomeIcon icon={RowIcon} size={13} color={c.text} />
                         <Text style={styles.probLabel}>{name}</Text>
                         <View style={styles.probBarBg}>
                           <View style={[styles.probBarFill, { width: `${Math.min(prob,100)}%`, backgroundColor: c.border }]} />
