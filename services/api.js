@@ -49,9 +49,24 @@ export const predictImage = async (imageUri) => {
         error: "We couldn't clearly recognize a rice leaf in this photo. Please make sure the leaf is well-lit, in focus, and takes up most of the screen." 
       };
     }
-
     return { success: true, data };
+
   } catch (error) {
-    return { success: false, error: error.message };
+    let userFriendlyError = error.message;
+
+    if (
+      error.message.includes("Network request failed") || 
+      error.message.includes("Failed to fetch") ||
+      error.message.includes("Aborted")
+    ) {
+      userFriendlyError = "Unable to connect to the server. Please check your internet connection or try again later.";
+    } 
+   
+    else if (error.message.includes("192.") || error.message.includes("http")) {
+      userFriendlyError = "Connection error. The server might be temporarily unavailable.";
+    }
+
+    return { success: false, error: userFriendlyError };
+    
   }
 };
