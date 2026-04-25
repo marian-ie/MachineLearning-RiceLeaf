@@ -46,7 +46,7 @@ export const predictImage = async (imageUri) => {
     if (data.is_uncertain) {
       return { 
         success: false, 
-        error: `Image not recognized clearly (Confidence: ${data.confidence}%). Please ensure you are scanning a clear photo of a rice leaf.` 
+        error: "We couldn't clearly recognize a rice leaf in this photo. Please make sure the leaf is well-lit, in focus, and takes up most of the screen." 
       };
     }
 
