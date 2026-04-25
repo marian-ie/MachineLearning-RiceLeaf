@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Animated, Image } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faLeaf, faEnvelope, faLock, faEye, faEyeSlash, faUser, faRightToBracket, faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import { registerUser, loginUser } from "../services/database.js";
+import { registerUser, loginUser, resetPasswordViaEmail } from "../services/database.js";
 import { ThemeContext } from "../ThemeContext"; 
 
 const Field = ({ icon, placeholder, value, onChangeText, secureEntry, toggleSecure, showToggle, keyboardType = "default", styles, colors }) => {
@@ -86,6 +86,11 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
   const [showConfirm,  setShowConfirm]    = useState(false);
   const [isLoading, setIsLoading]         = useState(false);
 
+  const [forgotModalVisible, setForgotModalVisible] = useState(false);
+  const [forgotEmail, setForgotEmail]               = useState("");
+  const [forgotNewPassword, setForgotNewPassword]   = useState("");
+  const [showForgotPw, setShowForgotPw]             = useState(false);
+
   const [loginEmail,    setLoginEmail]    = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
@@ -163,6 +168,32 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!forgotEmail || !forgotNewPassword) {
+      Alert.alert("Error", "Please enter your email and a new password.");
+      return;
+    }
+    if (forgotNewPassword.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters.");
+      return;
+    }
+
+    setIsLoading(true);
+    const result = await resetPasswordViaEmail(forgotEmail, forgotNewPassword);
+    setIsLoading(false);
+
+    if (result.success) {
+      Alert.alert("Success", "Your password has been reset successfully. Please log in.");
+      setForgotModalVisible(false);
+      setForgotEmail("");
+      setForgotNewPassword("");
+
+      setLoginEmail(forgotEmail); 
+    } else {
+      Alert.alert("Reset Failed", result.error);
+    }
+  };
+
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <ScrollView 
@@ -202,7 +233,9 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
               <Field icon={faEnvelope} placeholder="Email address" value={loginEmail} onChangeText={setLoginEmail} keyboardType="email-address" styles={styles} colors={colors} />
               <Field icon={faLock} placeholder="Password" value={loginPassword} onChangeText={setLoginPassword} secureEntry={!showPassword} showToggle toggleSecure={() => setShowPassword(p => !p)} styles={styles} colors={colors} />
               
-              <TouchableOpacity style={styles.forgotBtn} disabled={isLoading}><Text style={styles.forgotText}>Forgot password?</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.forgotBtn} onPress={() => setForgotModalVisible(true)} disabled={isLoading}>
+                <Text style={styles.forgotText}>Forgot password?</Text>
+              </TouchableOpacity>
               
               <TouchableOpacity style={styles.primaryBtn} onPress={handleLogin} activeOpacity={0.85} disabled={isLoading}>
                 {isLoading ? (
@@ -256,6 +289,28 @@ export default function LoginRegisterScreen({ onLoginSuccess }) {
         </View>
         <Text style={styles.footerNote}>By continuing you agree to our Terms of Service and Privacy Policy.</Text>
       </ScrollView>
+
+      <Modal visible={forgotModalVisible} transparent animationType="slide" onRequestClose={() => setForgotModalVisible(false)}>
+        <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <View style={{ backgroundColor: colors.cardBg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: Platform.OS === "ios" ? 40 : 36, gap: 14 }}>
+            <Text style={{ fontSize: 18, fontWeight: "800", color: colors.primary }}>Reset Password</Text>
+            <Text style={{ fontSize: 13, color: colors.textLight, marginBottom: 8 }}>Enter your registered email address and your new password.</Text>
+            
+            <Field icon={faEnvelope} placeholder="Registered Email" value={forgotEmail} onChangeText={setForgotEmail} keyboardType="email-address" styles={styles} colors={colors} />
+            <Field icon={faLock} placeholder="New Password" value={forgotNewPassword} onChangeText={setForgotNewPassword} secureEntry={!showForgotPw} showToggle toggleSecure={() => setShowForgotPw(p => !p)} styles={styles} colors={colors} />
+            
+            <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+              <TouchableOpacity style={[styles.primaryBtn, { flex: 1, backgroundColor: colors.borderLight, height: 48 }]} onPress={() => setForgotModalVisible(false)} disabled={isLoading}>
+                <Text style={{ color: colors.primary, fontWeight: "700" }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.primaryBtn, { flex: 1, height: 48 }]} onPress={handleForgotPassword} disabled={isLoading}>
+                 {isLoading ? <ActivityIndicator color="#FFF" size="small" /> : <Text style={styles.primaryBtnText}>Reset Password</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+      
     </KeyboardAvoidingView>
   );
 }

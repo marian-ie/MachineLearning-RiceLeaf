@@ -187,3 +187,20 @@ export const deleteUserAccount = async (userId) => {
   await db.runAsync("DELETE FROM users WHERE id = ?", [userId]);
   return { success: true };
 };
+
+export const resetPasswordViaEmail = async (email, newPassword) => {
+  if (!db) await initDatabase();
+  
+  const user = await db.getFirstAsync("SELECT * FROM users WHERE username = ?", [email]);
+  if (!user) return { success: false, error: "No account found with that email address." };
+
+  const salt = bcrypt.genSaltSync(10);
+  const hashedNewPassword = bcrypt.hashSync(newPassword, salt);
+
+  await db.runAsync(
+    "UPDATE users SET password = ? WHERE id = ?",
+    [hashedNewPassword, user.id]
+  );
+  
+  return { success: true };
+};
