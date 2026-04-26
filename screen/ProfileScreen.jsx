@@ -290,7 +290,7 @@ const getStyles = (colors) => StyleSheet.create({
     borderTopLeftRadius: 24, 
     borderTopRightRadius: 24, 
     padding: 22, 
-    paddingBottom: Platform.OS === "ios" ? 40 : 36, 
+    paddingBottom: Platform.OS === "ios" ? 40 : 40, 
     gap: 14 
   },
   modalHeader: { 
