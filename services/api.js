@@ -1,6 +1,6 @@
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 
-const API_BASE_URL = "https://marian522-ricestressclassification.hf.space";
+const API_BASE_URL = "https://syrrr-rice-leaf-stress-lab.hf.space";
 
 export const checkServerHealth = async () => {
   try {

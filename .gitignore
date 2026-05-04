@@ -2,3 +2,4 @@ node_modules
 .venv
 *.pth
 __pycache__/
+*.tflite
