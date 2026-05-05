@@ -176,7 +176,7 @@ export default function ScanScreen({ onNewScan, userId }) {
               </Text>
 
               <View style={styles.modelBadge}>
-                <Text style={styles.modelText}>Model: ResNet18 — 99.66% accuracy</Text>
+                <Text style={styles.modelText}>Model: ResNet18 V3 — 98.12% accuracy</Text>
               </View>
 
               {result.is_uncertain && (
